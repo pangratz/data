@@ -17,6 +17,13 @@ script:
   - npm run-script test:beta
   - npm run-script test:canary
   - npm run-script test:optional-features
+
+matrix:
+  fast_finish: true
+  allow_failures:
+    - script: npm run-script test:beta
+    - script: npm run-script test:canary
+
 after_success:
   - npm run-script publish-build:prebuilt
   - "./bin/bower-ember-data-build"
