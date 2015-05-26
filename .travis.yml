@@ -12,13 +12,20 @@ before_install:
 install:
 - "npm install"
 script:
-  - npm run-script test
-  - npm run-script test:beta
-  - npm run-script test:canary
+  - npm run-script $TEST_COMMAND
+
+matrix:
+  allow_failures:
+    - env: TEST_COMMAND="test:canary"
+
 after_success:
 - npm run-script publish-build
 - "./bin/bower-ember-data-build"
 env:
+  matrix:
+  - TEST_COMMAND="test"
+  - TEST_COMMAND="test:beta"
+  - TEST_COMMAND="test:canary"
   global:
   - BROCCOLI_ENV="production"
   - S3_BUILD_CACHE_BUCKET=emberjs-build-cache
