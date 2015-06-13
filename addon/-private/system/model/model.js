@@ -967,7 +967,75 @@ if (isEnabled("ds-references")) {
     */
     hasMany: function(name) {
       return this._internalModel.referenceFor('hasMany', name);
-    }
+    },
+
+    /**
+     * Invoked when the relationship is initialized for the first time.
+     *
+     * @method didInitRelationship
+     * @param name String name of relationship
+     * @param reference {DS.BelongsToReference|DS.HasManyReference} reference of relationship
+     */
+    didInitRelationship: Ember.K,
+
+    /**
+     * Invoked when the relationship is initialized for the first time and when
+     * the relationship is updated.
+     *
+     * @method didReceiveRelationship
+     * @param name String name of relationship
+     * @param reference {DS.BelongsToReference|DS.HasManyReference} reference of relationship
+     */
+    didReceiveRelationship: Ember.K,
+
+    /**
+     * Invoked when the relationship is updated.
+     *
+     * @method didUpdateRelationship
+     * @param name String name of relationship
+     * @param reference {DS.BelongsToReference|DS.HasManyReference} reference of relationship
+     */
+    didUpdateRelationship: Ember.K,
+
+    /**
+     * Invoked when data from the adapter has been provided for the first time.
+     *
+     * @method didInitData
+     * @param reference
+     * @param payload {Object} data from the adapter
+     */
+    didInitData: Ember.K,
+
+    /**
+     * Invoked when data from the adapter has been provided for the first time
+     * and when the data has been updated via the adapter.
+     *
+     * @method didReceiveData
+     * @param reference
+     * @param payload {Object} data from the adapter
+     */
+    didReceiveData: Ember.K,
+
+    /**
+     * Invoked when data has been updated via the adapter.
+     *
+     * @method didUpdateData
+     * @param reference
+     * @param payload {Object} data from the adapter
+     */
+    didUpdateData: Ember.K,
+
+    /**
+     * Invoked when either the backend state changed or the local state
+     * changed.
+     *
+     * Used to update properties that are derived from attributes.
+     *
+     * @method didUpdate
+     * @param reference
+     */
+    didUpdate: Ember.K
+
   });
 
 }
