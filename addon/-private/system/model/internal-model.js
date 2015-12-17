@@ -303,6 +303,9 @@ InternalModel.prototype = {
 
     This method is needed when data for the internal model is pushed and the
     pushed data might acknowledge dirty attributes as confirmed.
+
+    @method updateChangedAttributes
+    @private
    */
   updateChangedAttributes() {
     var changedAttributes = this.changedAttributes();
@@ -321,6 +324,9 @@ InternalModel.prototype = {
   /**
     Returns an object, whose keys are changed properties, and value is an
     [oldProp, newProp] array.
+
+    @method changedAttributes
+    @private
   */
   changedAttributes() {
     var oldData = this._data;
