@@ -196,3 +196,128 @@ test("Will reject save on invalid", function(assert) {
     });
   });
 });
+
+test("save while a created record is inFlight raises an assertion", function(assert) {
+  var post;
+
+  run(function() {
+    post = env.store.createRecord('post', {});
+  });
+
+  var firstSave;
+  env.adapter.createRecord = function() {
+    return new Ember.RSVP.Promise(function(resolve) {
+      firstSave = resolve;
+    });
+  };
+
+  run(function() {
+    post.save();
+  });
+
+  env.adapter.createRecord = function() {
+    assert.ok(false, "createRecord should not be called");
+  };
+
+  run(function() {
+    assert.expectAssertion(function() {
+      post.save();
+    }, "You cannot save a record which is currently inFlight; wait until the previous save() is finished");
+  });
+
+  run(function() {
+    // resolve the first save, so the record is not in the inFlight state
+    // anymore; this is needed as records in the inFlight state cannot be
+    // unloaded which raises an exception when the store is destroyed in the
+    // tests' afterEach
+    firstSave();
+  });
+});
+
+test("save while an updated record is inFlight raises an assertion", function(assert) {
+  var post;
+
+  run(function() {
+    post = env.store.push({
+      data: {
+        type: 'post',
+        id: 1
+      }
+    });
+
+    post.set("title", "new title");
+  });
+
+  var firstSave;
+  env.adapter.updateRecord = function() {
+    return new Ember.RSVP.Promise(function(resolve) {
+      firstSave = resolve;
+    });
+  };
+
+  run(function() {
+    post.save();
+  });
+
+  env.adapter.updateRecord = function() {
+    assert.ok(false, "updateRecord should not be called");
+  };
+
+  run(function() {
+    assert.expectAssertion(function() {
+      post.save();
+    }, "You cannot save a record which is currently inFlight; wait until the previous save() is finished");
+  });
+
+  run(function() {
+    // resolve the first save, so the record is not in the inFlight state
+    // anymore; this is needed as records in the inFlight state cannot be
+    // unloaded which raises an exception when the store is destroyed in the
+    // tests' afterEach
+    firstSave();
+  });
+});
+
+test("save while a deleted record is inFlight raises an assertion", function(assert) {
+  var post;
+
+  run(function() {
+    post = env.store.push({
+      data: {
+        type: 'post',
+        id: 1
+      }
+    });
+
+    post.deleteRecord();
+  });
+
+  var firstSave;
+  env.adapter.deleteRecord = function() {
+    return new Ember.RSVP.Promise(function(resolve) {
+      firstSave = resolve;
+    });
+  };
+
+  run(function() {
+    post.save();
+  });
+
+  env.adapter.deleteRecord = function() {
+    assert.ok(false, "deleteRecord should not be called");
+  };
+
+  run(function() {
+    assert.expectAssertion(function() {
+      post.save();
+    }, "You cannot save a record which is currently inFlight; wait until the previous save() is finished");
+  });
+
+  run(function() {
+    // resolve the first save, so the record is not in the inFlight state
+    // anymore; this is needed as records in the inFlight state cannot be
+    // unloaded which raises an exception when the store is destroyed in the
+    // tests' afterEach
+    firstSave();
+  });
+});

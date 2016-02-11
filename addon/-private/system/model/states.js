@@ -293,8 +293,7 @@ var DirtyState = {
 
     unloadRecord: assertAgainstUnloadRecord,
 
-    // TODO: More robust semantics around save-while-in-flight
-    willCommit: Ember.K,
+    willCommit: assertAgainstInFlight,
 
     didCommit(internalModel) {
       var dirtyType = get(this, 'dirtyType');
@@ -429,6 +428,10 @@ createdState.uncommitted.propertyWasReset = Ember.K;
 
 function assertAgainstUnloadRecord(internalModel) {
   assert("You can only unload a record which is not inFlight. `" + internalModel + "`", false);
+}
+
+function assertAgainstInFlight() {
+  assert("You cannot save a record which is currently inFlight; wait until the previous save() is finished", false);
 }
 
 updatedState.inFlight.unloadRecord = assertAgainstUnloadRecord;
@@ -653,8 +656,8 @@ var RootState = {
 
       unloadRecord: assertAgainstUnloadRecord,
 
-      // TODO: More robust semantics around save-while-in-flight
-      willCommit: Ember.K,
+      willCommit: assertAgainstInFlight,
+
       didCommit(internalModel) {
         internalModel.transitionTo('saved');
 
