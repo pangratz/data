@@ -72,7 +72,9 @@ module("unit/adapters/rest_adapter/group_records_for_find_many_test - DS.RESTAda
 
     Store = createStore({
       adapter: GroupsAdapter,
-      testRecord: DS.Model.extend()
+      testRecord: DS.Model.extend({
+        name: DS.attr()
+      })
     });
 
   },
@@ -143,22 +145,22 @@ test('findMany does not request duplicate ids - GH #4367', function(assert) {
   assert.deepEqual(requests[0].ids, ['1', '2']);
 });
 
-test('findMany does not request duplicate ids when a record is reloaded - GH #4367', function(assert) {
-  let record;
+test('findMany does not request duplicate ids when a record is dirty - GH #4367', function(assert) {
   Ember.run(function() {
     // bug occurs when the record is already in the store
-    record = Store.push({
+    let testRecord = Store.push({
       data: {
         type: 'test-record',
         id: 1
       }
     });
+
+    testRecord.set('name', 'updated name');
   });
 
   Ember.run(function() {
-    Store.findRecord('testRecord', 1, { shouldBackgroundReloadRecord: true });
-    record.reload();
-
+    Store.findRecord('testRecord', 1);
+    Store.findRecord('testRecord', 1);
     Store.findRecord('testRecord', 2);
   });
 

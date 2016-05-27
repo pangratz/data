@@ -239,9 +239,9 @@ var DirtyState = {
     // EVENTS
     didSetProperty: didSetProperty,
 
-    //TODO(Igor) reloading now triggers a
-    //loadingData event, though it seems fine?
-    loadingData: Ember.K,
+    loadingData(internalModel, promise) {
+      internalModel._loadingPromise = promise;
+    },
 
     propertyWasReset(internalModel, name) {
       if (!internalModel.hasChangedAttributes()) { internalModel.send('rolledBack'); }
