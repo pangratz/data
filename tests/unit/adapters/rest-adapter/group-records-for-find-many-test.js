@@ -121,3 +121,47 @@ test('_stripIDFromURL works with id being encoded - #4190', function(assert) {
 
   assert.equal(strippedUrl, '/testRecords/');
 });
+
+test('findMany does not request duplicate ids - GH #4367', function(assert) {
+  Ember.run(function() {
+    // bug occurs when the record is already in the store
+    Store.push({
+      data: {
+        type: 'test-record',
+        id: 1
+      }
+    });
+  });
+
+  Ember.run(function() {
+    Store.findRecord('testRecord', 1);
+    Store.findRecord('testRecord', 1);
+    Store.findRecord('testRecord', 2);
+  });
+
+  assert.equal(requests.length, 1);
+  assert.deepEqual(requests[0].ids, ['1', '2']);
+});
+
+test('findMany does not request duplicate ids when a record is reloaded - GH #4367', function(assert) {
+  let record;
+  Ember.run(function() {
+    // bug occurs when the record is already in the store
+    record = Store.push({
+      data: {
+        type: 'test-record',
+        id: 1
+      }
+    });
+  });
+
+  Ember.run(function() {
+    Store.findRecord('testRecord', 1, { shouldBackgroundReloadRecord: true });
+    record.reload();
+
+    Store.findRecord('testRecord', 2);
+  });
+
+  assert.equal(requests.length, 1);
+  assert.deepEqual(requests[0].ids, ['1', '2']);
+});

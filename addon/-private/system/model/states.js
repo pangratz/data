@@ -538,9 +538,9 @@ var RootState = {
     // FLAGS
     isLoaded: true,
 
-    //TODO(Igor) Reloading now triggers a loadingData event,
-    //but it should be ok?
-    loadingData: Ember.K,
+    loadingData(internalModel, promise) {
+      internalModel._loadingPromise = promise;
+    },
 
     // SUBSTATES
 

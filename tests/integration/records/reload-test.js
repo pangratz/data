@@ -181,3 +181,33 @@ test("When a record is reloaded, its async hasMany relationships still work", fu
     });
   });
 });
+
+test("clean record - reload() and findRecord() are coalesced into one request", function(assert) {
+  let person, reload, findRecord;
+  let findRecordCount = 0;
+
+  env.adapter.findRecord = function(store, type, id) {
+    findRecordCount++;
+    return Ember.RSVP.resolve({ id: 1, name: "Tom" });
+  }
+
+  run(function() {
+    person = env.store.push({
+      data: {
+        type: 'person',
+        id: 1
+      }
+    });
+  });
+
+  run(function() {
+    reload = person.reload();
+    findRecord = env.store.findRecord('person', 1, { backgroundReload: true });
+  });
+
+  run(function() {
+    Ember.RSVP.all([reload, findRecord]).then(function() {
+      assert.equal(findRecordCount, 1, "only 1 findRecord request is triggered");
+    });
+  });
+});
